@@ -8,6 +8,6 @@ import androidx.compose.ui.graphics.asImageAsset
 import java.net.URL
 
 fun main() {
-    println(TwemojiProvider.getTwemojiCodePoints().joinToString("\n"))
+    copyFile()
 }
 
