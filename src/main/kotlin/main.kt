@@ -19,17 +19,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.awt.Toolkit
 import java.awt.datatransfer.*
-import java.io.ByteArrayInputStream
 import java.io.File
-import java.net.URL
-import java.util.ArrayList
 
 data class Twemoji(val name: String, val codepoint: String) {
     companion object {
         fun getAll(): List<Twemoji> =
             File("twemoji-amazing.cfd").readLines().map {
                 val (name, codepoint) = it.split(":")
-//                println(name + " = " + codepoint)
                 Twemoji(name, codepoint)
             }
     }
@@ -38,7 +34,6 @@ data class Twemoji(val name: String, val codepoint: String) {
 fun main() = Window {
     var text by remember { mutableStateOf("Hello, World!") }
     val unicodePoints = remember { Twemoji.getAll() }
-    val svgThing = remember { svgAsset("rails.svg") }
     var search by remember { mutableStateOf("") }
 
 
@@ -97,41 +92,11 @@ fun EmojiCell(twemoji: Twemoji) {
 
 suspend fun copyEmoji(twemoji: Twemoji) {
     val svgString = client.get<String>(svgUrl(twemoji.codepoint))
+    val file = File.createTempFile("tmp", ".svg").apply { writeText(svgString) }
     val sysClip = Toolkit.getDefaultToolkit().systemClipboard;
-    val svgClip = SvgClip(svgString)
-    sysClip.setContents(svgClip, null)
+    sysClip.setContents(MyTransferable(file), null)
     println("put $twemoji in the clipboard!")
 }
-
-class SvgClip(val svgString: String) : Transferable {
-    val svgFlavor = DataFlavor("image/svg+xml; class=java.io.InputStream", "Scalable Vector Graphic")
-    val supportedFlavors = arrayOf(svgFlavor)
-
-    init {
-        (SystemFlavorMap.getDefaultFlavorMap() as SystemFlavorMap)
-            .addUnencodedNativeForFlavor(svgFlavor, "image/svg+xml")
-    }
-
-    override fun getTransferDataFlavors(): Array<DataFlavor> {
-        return supportedFlavors
-    }
-
-    override fun isDataFlavorSupported(flavor: DataFlavor?) = true
-
-    override fun getTransferData(flavor: DataFlavor?): Any {
-        return svgString
-    }
-
-}
-
-fun copyFile() {
-    val file = File("eyebrow.svg")
-    val listOfFiles = mutableListOf<File>()
-    listOfFiles.add(file)
-    val ft = FileTransferable(listOfFiles)
-    Toolkit.getDefaultToolkit().systemClipboard.setContents(ft) { clipboard, contents -> println("Lost ownership") }
-}
-
 
 fun pngUrl(codepoint: String): String {
     return "https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/$codepoint.png"
