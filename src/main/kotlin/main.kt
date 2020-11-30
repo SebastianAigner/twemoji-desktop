@@ -9,7 +9,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageAsset
-import androidx.compose.ui.graphics.asImageAsset
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import io.ktor.client.features.*
 import io.ktor.client.request.*
@@ -52,22 +53,22 @@ fun main() = Window {
     }
 }
 
-val twemojiAssets = mutableMapOf<Twemoji, ImageAsset>()
-suspend fun getTwemojiImage(twemoji: Twemoji): ImageAsset {
+val twemojiAssets = mutableMapOf<Twemoji, ImageBitmap>()
+suspend fun getTwemojiImage(twemoji: Twemoji): ImageBitmap {
     return twemojiAssets.getOrPut(twemoji) { obtainTwemojiImage(twemoji) }
 }
 
-suspend fun obtainTwemojiImage(twemoji: Twemoji): ImageAsset {
+suspend fun obtainTwemojiImage(twemoji: Twemoji): ImageBitmap {
     val byteArray = client.get<ByteArray>(pngUrl(twemoji.codepoint))
     val asset = withContext(Dispatchers.IO) {
-        org.jetbrains.skija.Image.makeFromEncoded(byteArray).asImageAsset()
+        org.jetbrains.skija.Image.makeFromEncoded(byteArray).asImageBitmap()
     }
     return asset
 }
 
 @Composable
 fun EmojiCell(twemoji: Twemoji) {
-    var imageFile by remember(twemoji.codepoint) { mutableStateOf<ImageAsset?>(null) }
+    var imageFile by remember(twemoji.codepoint) { mutableStateOf<ImageBitmap?>(null) }
 
     LaunchedEffect(twemoji) {
         imageFile = getTwemojiImage(twemoji)
@@ -81,7 +82,7 @@ fun EmojiCell(twemoji: Twemoji) {
     {
         Row {
             if (imageFile != null) {
-                Image(asset = imageFile!!, modifier = Modifier.padding(10.dp).width(36.dp).height(36.dp))
+                Image(imageFile!!, modifier = Modifier.padding(10.dp).width(36.dp).height(36.dp))
             } else {
                 Text("...", modifier = Modifier.padding(10.dp).width(36.dp).height(36.dp))
             }
