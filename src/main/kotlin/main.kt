@@ -2,13 +2,13 @@ import androidx.compose.desktop.Window
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
@@ -44,10 +44,12 @@ fun main() = Window {
             TextField(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).fillMaxWidth(),
                 value = search,
                 onValueChange = { search = it })
-            LazyColumnFor(unicodePoints.filter {
-                it.name.contains(search) || search.isBlank()
-            }) {
-                EmojiCell(it)
+            LazyColumn() {
+                items(items = unicodePoints.filter {
+                    it.name.contains(search) || search.isBlank()
+                }, itemContent = {
+                    EmojiCell(it)
+                })
             }
         }
     }
@@ -82,7 +84,7 @@ fun EmojiCell(twemoji: Twemoji) {
     {
         Row {
             if (imageFile != null) {
-                Image(imageFile!!, modifier = Modifier.padding(10.dp).width(36.dp).height(36.dp))
+                Image(imageFile!!, twemoji.name, modifier = Modifier.padding(10.dp).width(36.dp).height(36.dp))
             } else {
                 Text("...", modifier = Modifier.padding(10.dp).width(36.dp).height(36.dp))
             }
