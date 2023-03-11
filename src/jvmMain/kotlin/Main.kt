@@ -1,4 +1,3 @@
-import androidx.compose.desktop.Window
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,7 +10,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.application
 import io.ktor.client.features.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.Dispatchers
@@ -32,24 +34,24 @@ data class Twemoji(val name: String, val codepoint: String) {
     }
 }
 
-fun main() = Window {
+fun main() = application {
     var text by remember { mutableStateOf("Hello, World!") }
     val unicodePoints = remember { Twemoji.getAll() }
     var search by remember { mutableStateOf("") }
 
-
-
     MaterialTheme {
-        Column {
-            TextField(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).fillMaxWidth(),
-                value = search,
-                onValueChange = { search = it })
-            LazyColumn() {
-                items(items = unicodePoints.filter {
-                    it.name.contains(search) || search.isBlank()
-                }, itemContent = {
-                    EmojiCell(it)
-                })
+        Window(onCloseRequest = ::exitApplication) {
+            Column {
+                TextField(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).fillMaxWidth(),
+                    value = search,
+                    onValueChange = { search = it })
+                LazyColumn() {
+                    items(items = unicodePoints.filter {
+                        it.name.contains(search) || search.isBlank()
+                    }, itemContent = {
+                        EmojiCell(it)
+                    })
+                }
             }
         }
     }
@@ -63,7 +65,7 @@ suspend fun getTwemojiImage(twemoji: Twemoji): ImageBitmap {
 suspend fun obtainTwemojiImage(twemoji: Twemoji): ImageBitmap {
     val byteArray = client.get<ByteArray>(pngUrl(twemoji.codepoint))
     val asset = withContext(Dispatchers.IO) {
-        org.jetbrains.skija.Image.makeFromEncoded(byteArray).asImageBitmap()
+        org.jetbrains.skia.Image.makeFromEncoded(byteArray).toComposeImageBitmap()
     }
     return asset
 }

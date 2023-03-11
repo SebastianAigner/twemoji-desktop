@@ -1,9 +1,9 @@
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import org.apache.batik.transcoder.TranscoderInput
 import org.apache.batik.transcoder.TranscoderOutput
 import org.apache.batik.transcoder.image.PNGTranscoder
-import org.jetbrains.skija.Image
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -22,5 +22,5 @@ fun svgAsset(path: String): ImageBitmap {
     buffer.flush()
     buffer.close()
 
-    return org.jetbrains.skija.Image.makeFromEncoded(ba).asImageBitmap()
+    return org.jetbrains.skia.Image.makeFromEncoded(ba).toComposeImageBitmap()
 }
