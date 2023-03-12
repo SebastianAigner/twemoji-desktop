@@ -1,9 +1,9 @@
-name: Generate CSS
+name: Build Twemoji Desktop
 
 on: [ push, pull_request, workflow_dispatch ]
 
 jobs:
-  build_css:
+  build_app:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,6 +21,5 @@ jobs:
 
       - name: Execute Gradle build
         run: |
-          ./gradlew run
-          ./gradlew assemble testClasses -Pkotlin.incremental=false --no-daemon
+          ./gradlew build -Pkotlin.incremental=false --no-daemon
           ./gradlew check -Pkotlin.incremental=false --no-daemon
