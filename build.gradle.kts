@@ -25,7 +25,7 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 implementation("org.apache.xmlgraphics:batik-all:1.13")
                 implementation("com.google.code.gson:gson:2.10.1")
-                implementation("io.ktor:ktor-client-cio:1.4.2")
+                implementation("io.ktor:ktor-client-cio:1.6.8")
             }
         }
         val jvmTest by getting
